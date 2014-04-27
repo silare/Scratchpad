@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
@@ -144,10 +145,11 @@ public class EditorActivity extends Activity
             View rootView = inflater.inflate(R.layout.fragment_editor, container, false);
             EditText editMarkdown = (EditText) rootView.findViewById(R.id.edit_markdown);
             editMarkdown.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
+            editMarkdown.setTypeface(Typeface.MONOSPACE);
+
             WebView webPreview = (WebView) rootView.findViewById(R.id.web_preview);
             webPreview.setBackgroundColor(0x00000000);
             webPreview.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
-
             return rootView;
         }
 

@@ -9,7 +9,10 @@
         android:id="@+id/edit_markdown"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:gravity="top|left"
+        android:inputType="textMultiLine"
+        android:singleLine="false"/>
 
     <WebView
         android:id="@+id/web_preview"

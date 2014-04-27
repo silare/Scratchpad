@@ -11,8 +11,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.EditText;
-import android.widget.TextView;
 
 
 public class EditorActivity extends Activity
@@ -144,6 +144,10 @@ public class EditorActivity extends Activity
             View rootView = inflater.inflate(R.layout.fragment_editor, container, false);
             EditText editMarkdown = (EditText) rootView.findViewById(R.id.edit_markdown);
             editMarkdown.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
+            WebView webPreview = (WebView) rootView.findViewById(R.id.web_preview);
+            webPreview.setBackgroundColor(0x00000000);
+            webPreview.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
+
             return rootView;
         }
 

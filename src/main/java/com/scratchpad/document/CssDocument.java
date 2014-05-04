@@ -9,6 +9,7 @@ import java.io.InputStream;
 
 public class CssDocument implements Document
 {
+    private static final String DEFAULT_CSS_ASSET = "default_css.css";
     private static CssDocument nullInstance;
     String css;
 
@@ -29,7 +30,7 @@ public class CssDocument implements Document
             String defaultCss = "";
             try
             {
-                InputStream stream = assetManager.open("default_css.css");
+                InputStream stream = assetManager.open(DEFAULT_CSS_ASSET);
                 int size = stream.available();
                 byte[] buffer = new byte[size];
                 stream.read(buffer);
@@ -38,7 +39,8 @@ public class CssDocument implements Document
             }
             catch (IOException e)
             {
-                Log.e("CssDocument", "Could not open asset default_css.css: " + e.getMessage());
+                Log.e("CssDocument.getDefaultInstance", "Could not open asset " +
+                        DEFAULT_CSS_ASSET + ".", e);
             }
             nullInstance = new CssDocument(defaultCss);
         }

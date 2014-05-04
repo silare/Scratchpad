@@ -27,7 +27,6 @@ import com.scratchpad.document.WebDocument;
 public class EditorActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks
 {
-
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -38,6 +37,10 @@ public class EditorActivity extends Activity
      */
     private CharSequence mTitle;
 
+    /**
+     * Used to determine if the call to onNavigationDrawerItemSElect is user-initiated; ensures
+     * preservation of the data kept in the editor.
+     */
     private boolean isUserInitiatedNavDrawerSelection;
 
     @Override
@@ -137,6 +140,7 @@ public class EditorActivity extends Activity
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+        private static final String EDIT_MARKDOWN_TEXT_BUNDLE = "editMarkdownText";
         private String editMarkdownText;
         private EditText editMarkdown;
         private WebView webPreview;
@@ -163,8 +167,9 @@ public class EditorActivity extends Activity
             super.onViewStateRestored(savedInstanceState);
             if (savedInstanceState != null) {
                 // Restore text from editor.
-                String loadedEditMarkdownText = savedInstanceState.getString("editMarkdownText");
-                Log.i("EditorActivity.onSaveInstanceState",
+                String loadedEditMarkdownText =
+                        savedInstanceState.getString(EDIT_MARKDOWN_TEXT_BUNDLE);
+                Log.i("EditorActivity.onViewStateRestored",
                         "Loading from editMarkdownText in Bundle savedInstanceState: " +
                                 loadedEditMarkdownText);
                 editMarkdownText = loadedEditMarkdownText;
@@ -175,9 +180,9 @@ public class EditorActivity extends Activity
         @Override
         public void onSaveInstanceState(Bundle outState) {
             super.onSaveInstanceState(outState);
-            outState.putString("editMarkdownText", editMarkdownText);
-            Log.d("EditorActivity", "editMarkdown = " + editMarkdown);
-            Log.i("EditorActivity",
+            outState.putString(EDIT_MARKDOWN_TEXT_BUNDLE, editMarkdownText);
+            Log.d("EditorActivity.onSaveInstanceState", "editMarkdown = " + editMarkdown);
+            Log.i("EditorActivity.onSaveInstanceState",
                     "Saving as editMarkdownText in Bundle outState: " + editMarkdownText);
         }
 
@@ -185,23 +190,24 @@ public class EditorActivity extends Activity
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState)
         {
-            Log.d("EditorActivity", "Entering onCreateView()...");
             View rootView = inflater.inflate(R.layout.fragment_editor, container, false);
 
             if (null == editMarkdown)
             {
-                Log.d("EditorActivity", "Initializing editMarkdown with editMarkdownText = " +
-                        editMarkdownText + " ...");
+                Log.d("EditorActivity.onCreateView",
+                        "Initializing editMarkdown with editMarkdownText = " + editMarkdownText +
+                                " ...");
                 editMarkdown = (EditText) rootView.findViewById(R.id.edit_markdown);
                 editMarkdown.setTypeface(Typeface.MONOSPACE);
                 if (savedInstanceState != null)
                 {
                     String loadedEditMarkdownText =
                             savedInstanceState.getString("editMarkdownText");
-                    Log.i("EditorActivity.onSaveInstanceState",
+                    Log.i("EditorActivity.onCreateView",
                             "Loading from editMarkdownText in Bundle savedInstanceState: " +
                                     loadedEditMarkdownText);
-                    Log.i("EditorActivity", "loadedEditMarkdownText = " + loadedEditMarkdownText);
+                    Log.i("EditorActivity.onCreateView", "loadedEditMarkdownText = " +
+                            loadedEditMarkdownText);
                     editMarkdownText = loadedEditMarkdownText;
                     editMarkdown.setText(editMarkdownText);
                 }
@@ -213,7 +219,7 @@ public class EditorActivity extends Activity
 
             if (null == webPreview)
             {
-                Log.d("EditorActivity", "Initializing webPreview...");
+                Log.d("EditorActivity.onCreateView", "Initializing webPreview...");
                 webPreview = (WebView) rootView.findViewById(R.id.web_preview);
                 webPreview.setBackgroundColor(0x00000000);
                 webPreview.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
@@ -236,7 +242,6 @@ public class EditorActivity extends Activity
                 public void onTextChanged(CharSequence s, int start, int before, int count) {}
             });
 
-            Log.d("EditorActivity", "Exiting onCreateView() with return = " + rootView + " ...");
             return rootView;
         }
 

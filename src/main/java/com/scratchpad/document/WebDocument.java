@@ -2,6 +2,8 @@ package com.scratchpad.document;
 
 import android.content.Context;
 
+import com.scratchpad.util.MarkdownUtils;
+
 import org.markdownj.MarkdownProcessor;
 
 public class WebDocument implements Document
@@ -10,6 +12,7 @@ public class WebDocument implements Document
             "<!doctype html>\n" +
             "<html>\n" +
             "<head>\n" +
+            "<title>%s</title>\n" +
             "<style>\n" +
             "%s\n" +
             "</style>\n" +
@@ -47,8 +50,9 @@ public class WebDocument implements Document
     {
         String css = cssDocument.getContent();
         String markdown = markdownDocument.getContent();
+        String title = MarkdownUtils.getTitleFromMarkdown(markdown);
         String body = new MarkdownProcessor().markdown(markdown);
-        return String.format(HTML_FORMAT, css, body);
+        return String.format(HTML_FORMAT, title, css, body);
     }
 
     WebDocument(MarkdownDocument markdownDocument, CssDocument cssDocument)

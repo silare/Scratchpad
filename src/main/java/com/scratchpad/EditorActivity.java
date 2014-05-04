@@ -7,6 +7,9 @@ import android.app.FragmentManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +17,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.EditText;
+import android.widget.TextView;
+
+import com.scratchpad.document.CssDocument;
+import com.scratchpad.document.MarkdownDocument;
+import com.scratchpad.document.WebDocument;
 
 
 public class EditorActivity extends Activity
@@ -29,6 +37,8 @@ public class EditorActivity extends Activity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+
+    private boolean isUserInitiatedNavDrawerSelection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -49,11 +59,18 @@ public class EditorActivity extends Activity
     @Override
     public void onNavigationDrawerItemSelected(int position)
     {
-        // update the main content by replacing fragments
         FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                .commit();
+        if (!isUserInitiatedNavDrawerSelection)
+        {
+            isUserInitiatedNavDrawerSelection = true;
+            Fragment fragment = fragmentManager.findFragmentById(R.id.container);
+            if (fragment == null)
+            {
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                        .commit();
+            }
+        }
     }
 
     public void onSectionAttached(int number)
@@ -120,6 +137,9 @@ public class EditorActivity extends Activity
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+        private String editMarkdownText;
+        private EditText editMarkdown;
+        private WebView webPreview;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -139,17 +159,84 @@ public class EditorActivity extends Activity
         }
 
         @Override
+        public void onViewStateRestored(Bundle savedInstanceState) {
+            super.onViewStateRestored(savedInstanceState);
+            if (savedInstanceState != null) {
+                // Restore text from editor.
+                String loadedEditMarkdownText = savedInstanceState.getString("editMarkdownText");
+                Log.i("EditorActivity.onSaveInstanceState",
+                        "Loading from editMarkdownText in Bundle savedInstanceState: " +
+                                loadedEditMarkdownText);
+                editMarkdownText = loadedEditMarkdownText;
+                editMarkdown.setText(editMarkdownText);
+            }
+        }
+
+        @Override
+        public void onSaveInstanceState(Bundle outState) {
+            super.onSaveInstanceState(outState);
+            outState.putString("editMarkdownText", editMarkdownText);
+            Log.d("EditorActivity", "editMarkdown = " + editMarkdown);
+            Log.i("EditorActivity",
+                    "Saving as `editMarkdownText` in Bundle outState: " + editMarkdownText);
+        }
+
+        @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState)
         {
+            Log.d("EditorActivity", "Entering onCreateView()...");
             View rootView = inflater.inflate(R.layout.fragment_editor, container, false);
-            EditText editMarkdown = (EditText) rootView.findViewById(R.id.edit_markdown);
-            editMarkdown.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
-            editMarkdown.setTypeface(Typeface.MONOSPACE);
 
-            WebView webPreview = (WebView) rootView.findViewById(R.id.web_preview);
-            webPreview.setBackgroundColor(0x00000000);
-            webPreview.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
+            if (null == editMarkdown)
+            {
+                Log.d("EditorActivity", "Initializing editMarkdown with editMarkdownText = " +
+                        editMarkdownText + " ...");
+                editMarkdown = (EditText) rootView.findViewById(R.id.edit_markdown);
+                editMarkdown.setTypeface(Typeface.MONOSPACE);
+                if (savedInstanceState != null)
+                {
+                    String loadedEditMarkdownText =
+                            savedInstanceState.getString("editMarkdownText");
+                    Log.i("EditorActivity.onSaveInstanceState",
+                            "Loading from editMarkdownText in Bundle savedInstanceState: " +
+                                    loadedEditMarkdownText);
+                    Log.i("EditorActivity", "loadedEditMarkdownText = " + loadedEditMarkdownText);
+                    editMarkdownText = loadedEditMarkdownText;
+                    editMarkdown.setText(editMarkdownText);
+                }
+                else
+                {
+                    editMarkdown.setText(editMarkdownText);
+                }
+            }
+
+            if (null == webPreview)
+            {
+                Log.d("EditorActivity", "Initializing webPreview...");
+                webPreview = (WebView) rootView.findViewById(R.id.web_preview);
+                webPreview.setBackgroundColor(0x00000000);
+                webPreview.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
+            }
+
+            editMarkdown.addTextChangedListener(new TextWatcher()
+            {
+                public void afterTextChanged(Editable s)
+                {
+                    editMarkdownText = editMarkdown.getText().toString();
+                    MarkdownDocument markdownDocument =
+                            MarkdownDocument.getInstance(editMarkdownText);
+                    WebDocument webDocument = WebDocument.getInstance(markdownDocument,
+                            CssDocument.getDefaultInstance());
+                    webPreview.loadData(webDocument.getContent(), "text/html", null);
+                }
+
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            });
+
+            Log.d("EditorActivity", "Exiting onCreateView() with return = " + rootView + " ...");
             return rootView;
         }
 
@@ -161,5 +248,4 @@ public class EditorActivity extends Activity
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
     }
-
 }

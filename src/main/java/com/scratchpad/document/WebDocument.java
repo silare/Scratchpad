@@ -1,19 +1,23 @@
 package com.scratchpad.document;
 
+import android.content.Context;
+
 import org.markdownj.MarkdownProcessor;
 
 public class WebDocument implements Document
 {
     private static final String HTML_FORMAT =
+            "<!doctype html>\n" +
             "<html>\n" +
-                    "<head>\n" +
-                    "<style>\n" +
-                    "%s\n" +
-                    "</style>\n" +
-                    "<body>\n" +
-                    "%s\n" +
-                    "</body>\n" +
-                    "</html>";
+            "<head>\n" +
+            "<title>%s</title>\n" +
+            "<style>\n" +
+            "%s\n" +
+            "</style>\n" +
+            "<body>\n" +
+            "%s\n" +
+            "</body>\n" +
+            "</html>";
 
     private static WebDocument nullInstance;
     MarkdownDocument markdownDocument;
@@ -23,15 +27,18 @@ public class WebDocument implements Document
                                           CssDocument cssDocument)
     {
         WebDocument webDocument = new WebDocument(markdownDocument, cssDocument);
+
+        // TODO Add HTML validation here.
+
         return webDocument;
     }
 
-    public static WebDocument getDefaultInstance()
+    public static WebDocument getDefaultInstance(Context context)
     {
         if (null == nullInstance)
         {
             nullInstance = new WebDocument(MarkdownDocument.getDefaultInstance(),
-                    CssDocument.getDefaultInstance());
+                    CssDocument.getDefaultInstance(context));
         }
         return nullInstance;
     }

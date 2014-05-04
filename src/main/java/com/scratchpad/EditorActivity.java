@@ -178,7 +178,7 @@ public class EditorActivity extends Activity
             outState.putString("editMarkdownText", editMarkdownText);
             Log.d("EditorActivity", "editMarkdown = " + editMarkdown);
             Log.i("EditorActivity",
-                    "Saving as `editMarkdownText` in Bundle outState: " + editMarkdownText);
+                    "Saving as editMarkdownText in Bundle outState: " + editMarkdownText);
         }
 
         @Override
@@ -227,7 +227,7 @@ public class EditorActivity extends Activity
                     MarkdownDocument markdownDocument =
                             MarkdownDocument.getInstance(editMarkdownText);
                     WebDocument webDocument = WebDocument.getInstance(markdownDocument,
-                            CssDocument.getDefaultInstance());
+                            CssDocument.getDefaultInstance(getActivity()));
                     webPreview.loadData(webDocument.getContent(), "text/html", null);
                 }
 

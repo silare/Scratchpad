@@ -1,0 +1,59 @@
+body
+{
+    color: #FFFFFF;
+    font-size: 12pt;
+    font-family: "Roboto Light", "Roboto Lt", sans-serif-light;
+}
+
+a
+{
+    color: #33B5E5;
+}
+
+h1
+{
+    color: #33B5E5;
+    font-family: "Roboto Light", "Roboto Lt", sans-serif-light;
+    font-weight: normal;
+    font-size: 36pt;
+}
+
+h2
+{
+    color: #33B5E5;
+    font-family: "Roboto Light", "Roboto Lt", sans-serif-light;
+    font-weight: normal;
+    font-size: 28pt;
+}
+
+h3
+{
+    color: #33B5E5;
+    font-family: "Roboto Light", "Roboto Lt", sans-serif-light;
+    font-weight: normal;
+    font-size: 24pt;
+}
+
+h4
+{
+    color: #33B5E5;
+    font-family: "Roboto", sans-serif;
+    font-weight: normal;
+    font-size: 16pt;
+}
+
+h5
+{
+    color: #33B5E5;
+    font-family: "Roboto", sans-serif;
+    font-weight: normal;
+    font-size: 14pt;
+}
+
+h6
+{
+    color: #33B5E5;
+    font-family: "Roboto", sans-serif;
+    font-weight: normal;
+    font-size: 12pt;
+}

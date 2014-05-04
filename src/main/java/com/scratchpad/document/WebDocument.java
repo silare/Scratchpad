@@ -10,7 +10,6 @@ public class WebDocument implements Document
             "<!doctype html>\n" +
             "<html>\n" +
             "<head>\n" +
-            "<title>%s</title>\n" +
             "<style>\n" +
             "%s\n" +
             "</style>\n" +

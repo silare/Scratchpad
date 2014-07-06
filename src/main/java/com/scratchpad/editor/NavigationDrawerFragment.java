@@ -84,6 +84,8 @@ public class NavigationDrawerFragment extends Fragment
     private boolean isFromSavedInstanceState;
     private boolean isUserLearnedDrawer;
 
+    private List<Document> documents;
+
     public void setEditorFragment(EditorActivity.EditorFragment editorFragment)
     {
         this.editorFragment = editorFragment;
@@ -163,7 +165,7 @@ public class NavigationDrawerFragment extends Fragment
                         e);
             }
 
-            Document document = MarkdownDocument.getInstance(markdown);
+            Document document = MarkdownDocument.getInstance(title, markdown);
             documents.add(document);
             documentMap.put("title", title);
             documentMap.put("markdown", markdown);
@@ -180,6 +182,7 @@ public class NavigationDrawerFragment extends Fragment
         drawerListView.setAdapter(simpleAdapter);
         drawerListView.setItemChecked(currentSelectedPosition, true);
         drawerListView.invalidateViews();
+        this.documents = documents;
     }
 
     public boolean isDrawerOpen()
@@ -346,6 +349,11 @@ public class NavigationDrawerFragment extends Fragment
         return super.onOptionsItemSelected(item);
     }
 
+    public List<Document> getDocuments()
+    {
+        return documents;
+    }
+
     /**
      * Per the navigation drawer design guidelines, updates the action bar to show the global app
      * 'context', rather than just what's in the current screen.
@@ -383,7 +391,7 @@ public class NavigationDrawerFragment extends Fragment
 
     private void openDocument()
     {
-        editorFragment.openDocument();
+        editorFragment.showOpenDocumentDialog();
     }
 
     private void saveDocument()

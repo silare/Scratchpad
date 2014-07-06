@@ -5,5 +5,6 @@ package com.scratchpad.document;
  */
 public interface Document
 {
+    String getTitle();
     String getContent();
 }

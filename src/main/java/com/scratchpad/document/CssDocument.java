@@ -48,6 +48,12 @@ public class CssDocument implements Document
     }
 
     @Override
+    public String getTitle()
+    {
+        throw new RuntimeException("IMPLEMENT THIS");
+    }
+
+    @Override
     public String getContent()
     {
         return css;

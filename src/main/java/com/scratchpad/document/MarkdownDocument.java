@@ -3,11 +3,12 @@ package com.scratchpad.document;
 public class MarkdownDocument implements Document
 {
     private static MarkdownDocument nullInstance;
+    String title;
     String markdown;
 
-    public static MarkdownDocument getInstance(String markdown)
+    public static MarkdownDocument getInstance(String title, String markdown)
     {
-        MarkdownDocument markdownDocument = new MarkdownDocument(markdown);
+        MarkdownDocument markdownDocument = new MarkdownDocument(title, markdown);
         return markdownDocument;
     }
 
@@ -15,9 +16,15 @@ public class MarkdownDocument implements Document
     {
         if (null == nullInstance)
         {
-            nullInstance = new MarkdownDocument("");
+            nullInstance = new MarkdownDocument("", "");
         }
         return nullInstance;
+    }
+
+    @Override
+    public String getTitle()
+    {
+        return title;
     }
 
     @Override
@@ -26,8 +33,9 @@ public class MarkdownDocument implements Document
         return markdown;
     }
 
-    MarkdownDocument(String markdown)
+    MarkdownDocument(String title, String markdown)
     {
+        this.title = title;
         this.markdown = markdown;
     }
 }

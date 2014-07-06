@@ -46,6 +46,12 @@ public class WebDocument implements Document
     }
 
     @Override
+    public String getTitle()
+    {
+        throw new RuntimeException("IMPLEMENT THIS");
+    }
+
+    @Override
     public String getContent()
     {
         String css = cssDocument.getContent();

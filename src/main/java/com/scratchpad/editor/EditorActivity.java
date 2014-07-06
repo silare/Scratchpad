@@ -89,6 +89,11 @@ public class EditorActivity extends Activity
                         .commit();
             }
         }
+        if (navigationDrawerFragment != null &&
+                navigationDrawerFragment.getDocuments() != null) {
+            editorFragment.openDocument(navigationDrawerFragment
+                    .getDocuments().get(position).getTitle());
+        }
     }
 
     public void onSectionAttached(int number)
@@ -142,7 +147,7 @@ public class EditorActivity extends Activity
                 editorFragment.newDocument();
                 return true;
             case R.id.action_open:
-                editorFragment.openDocument();
+                editorFragment.showOpenDocumentDialog();
                 return true;
             case R.id.action_save:
                 editorFragment.saveDocument();
@@ -242,7 +247,7 @@ public class EditorActivity extends Activity
                         "Initializing editMarkdown with editMarkdownText = " + editMarkdownText +
                                 " ..."
                 );
-                editMarkdown = (EditText) rootView.findViewById(R.id.edit_markdown);
+                editMarkdown = (EditText) rootView.findViewById(R.id.edit_content);
                 editMarkdown.setTypeface(Typeface.MONOSPACE);
                 if (savedInstanceState != null)
                 {
@@ -276,7 +281,7 @@ public class EditorActivity extends Activity
                 {
                     editMarkdownText = editMarkdown.getText().toString();
                     MarkdownDocument markdownDocument =
-                            MarkdownDocument.getInstance(editMarkdownText);
+                            MarkdownDocument.getInstance(filename, editMarkdownText);
                     WebDocument webDocument = WebDocument.getInstance(markdownDocument,
                             CssDocument.getDefaultInstance(getActivity()));
                     webPreview.loadData(webDocument.getContent(), "text/html", null);
@@ -336,7 +341,7 @@ public class EditorActivity extends Activity
             alert.show();
         }
 
-        public void openDocument()
+        public void showOpenDocumentDialog()
         {
             // TODO Clean up this block of code!
             AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
@@ -351,52 +356,7 @@ public class EditorActivity extends Activity
 
             alert.setPositiveButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
-                    if ((filename != null) && (!filename.isEmpty()))
-                    {
-                        saveDocument();
-                    }
-
-                    String openTitle = input.getText().toString();
-                    String openFilename = openTitle + MD_EXTENSION;
-                    File dirMarkdown = new File(getExternalFilesDir(), getString(R.string.dir_md));
-                    File inputFile = new File(dirMarkdown, openFilename);
-                    if (!inputFile.exists())
-                    {
-                        Toast.makeText(getActivity(),
-                                String.format("Could not find document %s.", openTitle),
-                                Toast.LENGTH_SHORT).show();
-                        Log.e("editMarkdown.openDocument",
-                                String.format("Could not find file %s.", openFilename));
-                    }
-                    else
-                    {
-                        try
-                        {
-                            Log.i("editMarkdown.openDocument",
-                                    String.format("Opening file %s.", openFilename));
-                            Scanner scanner = new Scanner(inputFile);
-                            String openText = "";
-                            while (scanner.hasNextLine())
-                            {
-                                openText += scanner.nextLine() + MarkdownUtils.LINE_SEPARATOR;
-                            }
-                            scanner.close();
-                            setTitle(openTitle);
-                            filename = openFilename;
-                            editMarkdownText = openText;
-                            editMarkdown.setText(openText);
-                            MarkdownDocument markdownDocument =
-                                    MarkdownDocument.getInstance(editMarkdownText);
-                            WebDocument webDocument = WebDocument.getInstance(markdownDocument,
-                                    CssDocument.getDefaultInstance(getActivity()));
-                            webPreview.loadData(webDocument.getContent(), "text/html", null);
-                        }
-                        catch (IOException e)
-                        {
-                            Log.e("editMarkdown.openDocument",
-                                    String.format("Unable to read file %s:", openFilename), e);
-                        }
-                    }
+                    openDocument(input.getText().toString());
                 }
             });
 
@@ -412,8 +372,60 @@ public class EditorActivity extends Activity
             alert.show();
         }
 
+        public void openDocument(String title) {
+            if ((filename != null) && (!filename.isEmpty()))
+            {
+                saveDocument();
+            }
+
+            String openTitle = title;
+            String openFilename = openTitle + MD_EXTENSION;
+            File dirMarkdown = new File(getExternalFilesDir(), getString(R.string.dir_md));
+            File inputFile = new File(dirMarkdown, openFilename);
+            if (!inputFile.exists())
+            {
+                Toast.makeText(getActivity(),
+                        String.format("Could not find document %s.", openTitle),
+                        Toast.LENGTH_SHORT).show();
+                Log.e("editMarkdown.showOpenDocumentDialog",
+                        String.format("Could not find file %s.", openFilename));
+            }
+            else
+            {
+                try
+                {
+                    Log.i("editMarkdown.showOpenDocumentDialog",
+                            String.format("Opening file %s.", openFilename));
+                    Scanner scanner = new Scanner(inputFile);
+                    String openText = "";
+                    while (scanner.hasNextLine())
+                    {
+                        openText += scanner.nextLine() + MarkdownUtils.LINE_SEPARATOR;
+                    }
+                    scanner.close();
+                     setTitle(openTitle);
+                    filename = openFilename;
+                    editMarkdownText = openText;
+                    editMarkdown.setText(openText);
+                    MarkdownDocument markdownDocument =
+                            MarkdownDocument.getInstance(filename, editMarkdownText);
+                    WebDocument webDocument = WebDocument.getInstance(markdownDocument,
+                            CssDocument.getDefaultInstance(getActivity()));
+                    webPreview.loadData(webDocument.getContent(), "text/html", null);
+                }
+                catch (IOException e)
+                {
+                    Log.e("editMarkdown.showOpenDocumentDialog",
+                            String.format("Unable to read file %s:", openFilename), e);
+                }
+            }
+        }
+
         public void saveDocument()
         {
+            String dirName = getString(R.string.dir_md) != null
+                    ? getString(R.string.dir_md)
+                    : "Scratchpad/markdown";
             File dirMarkdown = new File(getExternalFilesDir(), getString(R.string.dir_md));
             dirMarkdown.mkdirs();
             File outputFile = new File(dirMarkdown, filename);

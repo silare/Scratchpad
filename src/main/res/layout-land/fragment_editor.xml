@@ -6,7 +6,7 @@
     tools:context="com.scratchpad.editor.EditorActivity.EditorFragment">
 
     <EditText
-        android:id="@+id/edit_markdown"
+        android:id="@+id/edit_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"

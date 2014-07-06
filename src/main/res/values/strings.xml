@@ -7,7 +7,20 @@
     <string name="title_section3">Section 3</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_example">Example action</string>
+    <string name="action_new">New</string>
+    <string name="action_open">Open</string>
+    <string name="action_save">Save</string>
     <string name="action_settings">Settings</string>
+    <string name="dir_md">Scratchpad/markdown</string>
+    <string name="dir_html">Scratchpad/html</string>
+    <string name="dir_css">Scratchpad/css</string>
+    <string name="create_title">New document</string>
+    <string name="create_hint">Document title</string>
+    <string name="open_title">Open document</string>
+    <string name="open_hint">Document title</string>
+    <string name="action_set_title">SET_TITLE</string>
+    <string name="extra_title">title</string>
+    <string name="title_activity_picker">PickerActivity</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

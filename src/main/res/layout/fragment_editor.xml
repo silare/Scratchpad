@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.scratchpad.EditorActivity$PlaceholderFragment">
+    tools:context="com.scratchpad.editor.EditorActivity.EditorFragment">
 
     <EditText
         android:id="@+id/edit_markdown"

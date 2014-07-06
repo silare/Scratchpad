@@ -7,6 +7,7 @@ import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -14,6 +15,7 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -56,9 +58,14 @@ public class NavigationDrawerFragment extends Fragment
     public static final String MARKDOWN = "markdown";
 
     /**
-     * Navigation drawer character width.
+     * Navigation drawer character width for portrait orientation.
      */
-    public static final int MAX_CONTENT_LENGTH = 22;
+    public static final int MAX_CONTENT_LENGTH_PORTRAIT = 22;
+
+    /**
+     * Navigation drawer character width for landscape orientation.
+     */
+    public static final int MAX_CONTENT_LENGTH_LANDSCAPE = 32;
 
     /**
      * Remember the position of the selected item.
@@ -131,7 +138,6 @@ public class NavigationDrawerFragment extends Fragment
         drawerListView = (ListView) inflater.inflate(
                 R.layout.fragment_list, container, false);
         drawerListView.setBackgroundColor(Color.rgb(50, 50, 50));
-        drawerListView.setMinimumWidth(400);
         drawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -143,13 +149,14 @@ public class NavigationDrawerFragment extends Fragment
     }
 
     public void reloadListView() {
-        File scratchpadDir = new File(getActivity().getFilesDir(), getString(R.string.dir_md));
-        scratchpadDir.mkdir();
-
         File dirMarkdown = new File(Environment.getExternalStorageDirectory(), getString(R.string.dir_md));
+        dirMarkdown.mkdirs();
         List<File> files = Arrays.asList(dirMarkdown.listFiles());
         List<Document> documents = new ArrayList<Document>();
         List<Map<String, String>> documentMaps = new ArrayList<Map<String, String>>();
+
+        int maxContentLength = calculateMaxContentLength();
+
         for (File file : files)
         {
             Map<String, String> documentMap = new HashMap<String, String>();
@@ -162,15 +169,15 @@ public class NavigationDrawerFragment extends Fragment
                 while (scanner.hasNext() && !shouldStopScanning)
                 {
                     String nextWord = scanner.next();
-                    if ((markdown.length() + nextWord.length()) > MAX_CONTENT_LENGTH)
+                    if ((markdown.length() + nextWord.length()) > maxContentLength)
                     {
                         shouldStopScanning = true;
-                        int truncateLength = MAX_CONTENT_LENGTH - markdown.length();
+                        int truncateLength = maxContentLength - markdown.length();
                         markdown += nextWord.substring(0, truncateLength) + "...";
                     }
                     else
                     {
-                        markdown += nextWord;
+                        markdown += nextWord + " ";
                     }
                 }
             }
@@ -201,6 +208,27 @@ public class NavigationDrawerFragment extends Fragment
         this.documents = documents;
     }
 
+    /**
+     * Returns the maximum content length allowed for the navigation drawer
+     * based on the current display orientation.
+     *
+     * @return maximum content length
+     */
+    private int calculateMaxContentLength() {
+        int maxContentLength;Display getOrient = getActivity().getWindowManager().getDefaultDisplay();
+        Point outPoint = new Point();
+        getOrient.getSize(outPoint);
+        if (outPoint.x > outPoint.y)
+        {
+            maxContentLength = MAX_CONTENT_LENGTH_LANDSCAPE;
+        }
+        else
+        {
+            maxContentLength = MAX_CONTENT_LENGTH_PORTRAIT;
+        }
+        return maxContentLength;
+    }
+
     public boolean isDrawerOpen()
     {
         return drawerLayout != null && drawerLayout.isDrawerOpen(fragmentContainerView);
@@ -216,7 +244,6 @@ public class NavigationDrawerFragment extends Fragment
     {
         fragmentContainerView = getActivity().findViewById(fragmentId);
         this.drawerLayout = drawerLayout;
-        this.drawerLayout.setMinimumWidth(480);
         this.drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
         ActionBar actionBar = getActionBar();

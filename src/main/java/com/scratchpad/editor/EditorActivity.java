@@ -423,9 +423,6 @@ public class EditorActivity extends Activity
 
         public void saveDocument()
         {
-            String dirName = getString(R.string.dir_md) != null
-                    ? getString(R.string.dir_md)
-                    : "Scratchpad/markdown";
             File dirMarkdown = new File(getExternalFilesDir(), getString(R.string.dir_md));
             dirMarkdown.mkdirs();
             File outputFile = new File(dirMarkdown, filename);

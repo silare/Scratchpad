@@ -56,6 +56,11 @@ public class NavigationDrawerFragment extends Fragment
     public static final String MARKDOWN = "markdown";
 
     /**
+     * Navigation drawer character width.
+     */
+    public static final int MAX_CONTENT_LENGTH = 22;
+
+    /**
      * Remember the position of the selected item.
      */
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
@@ -153,9 +158,20 @@ public class NavigationDrawerFragment extends Fragment
             try
             {
                 Scanner scanner = new Scanner(file);
-                while (scanner.hasNextLine())
+                boolean shouldStopScanning = false;
+                while (scanner.hasNext() && !shouldStopScanning)
                 {
-                    markdown += scanner.nextLine();
+                    String nextWord = scanner.next();
+                    if ((markdown.length() + nextWord.length()) > MAX_CONTENT_LENGTH)
+                    {
+                        shouldStopScanning = true;
+                        int truncateLength = MAX_CONTENT_LENGTH - markdown.length();
+                        markdown += nextWord.substring(0, truncateLength) + "...";
+                    }
+                    else
+                    {
+                        markdown += nextWord;
+                    }
                 }
             }
             catch (FileNotFoundException e)
@@ -167,8 +183,8 @@ public class NavigationDrawerFragment extends Fragment
 
             Document document = MarkdownDocument.getInstance(title, markdown);
             documents.add(document);
-            documentMap.put("title", title);
-            documentMap.put("markdown", markdown);
+            documentMap.put(TITLE, title);
+            documentMap.put(MARKDOWN, markdown);
             documentMaps.add(documentMap);
         }
 

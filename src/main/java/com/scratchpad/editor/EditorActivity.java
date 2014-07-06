@@ -349,7 +349,7 @@ public class EditorActivity extends Activity
             input.setHint(R.string.open_hint);
             alert.setView(input);
 
-            alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            alert.setPositiveButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     if ((filename != null) && (!filename.isEmpty()))
                     {
@@ -400,7 +400,7 @@ public class EditorActivity extends Activity
                 }
             });
 
-            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+            alert.setNegativeButton(getString(R.string.button_cancel), new DialogInterface.OnClickListener()
             {
                 public void onClick(DialogInterface dialog, int whichButton)
                 {

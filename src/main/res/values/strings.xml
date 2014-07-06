@@ -21,6 +21,8 @@
     <string name="action_set_title">SET_TITLE</string>
     <string name="extra_title">title</string>
     <string name="title_activity_picker">PickerActivity</string>
+    <string name="button_ok">OK</string>
+    <string name="button_cancel">Cancel</string>
     <string name="hello_world">Hello world!</string>
 
 </resources>

@@ -137,7 +137,7 @@ public class NavigationDrawerFragment extends Fragment
     {
         drawerListView = (ListView) inflater.inflate(
                 R.layout.fragment_list, container, false);
-        drawerListView.setBackgroundColor(Color.rgb(50, 50, 50));
+        drawerListView.setBackgroundColor(Color.rgb(16, 16, 16));
         drawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -173,7 +173,11 @@ public class NavigationDrawerFragment extends Fragment
                     {
                         shouldStopScanning = true;
                         int truncateLength = maxContentLength - markdown.length();
-                        markdown += nextWord.substring(0, truncateLength) + "...";
+                        if (truncateLength > 0)
+                        {
+                            markdown += nextWord.substring(0, truncateLength);
+                        }
+                        markdown += "...";
                     }
                     else
                     {

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="1dp"
+    android:layout_gravity="center">
+
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_document"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardCornerRadius="2dp"
+        card_view:cardBackgroundColor="#101010">
+
+        <LinearLayout
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="15dp"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                android:fontFamily="sans-serif-light"
+                android:text="Title"/>
+
+            <TextView
+                android:id="@+id/text_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="15dp"
+                android:textColor="#808080"
+                android:textSize="16sp"
+                android:text="Content goes here."/>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+</RelativeLayout>

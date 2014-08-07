@@ -6,6 +6,8 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Picture;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
@@ -26,6 +28,7 @@ import com.scratchpad.R;
 import com.scratchpad.document.CssDocument;
 import com.scratchpad.document.MarkdownDocument;
 import com.scratchpad.document.WebDocument;
+import com.scratchpad.util.Constants;
 import com.scratchpad.util.MarkdownUtils;
 
 import java.io.File;
@@ -55,6 +58,8 @@ public class EditorActivity extends Activity
 
     private EditorFragment editorFragment;
 
+    private String title;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -66,11 +71,19 @@ public class EditorActivity extends Activity
         navigationDrawerFragment.setEditorFragment(editorFragment);
         actionBarTitle = getTitle();
 
+
         // Set up the drawer.
         navigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
         navigationDrawerFragment.reloadListView();
+
+        // Load a file if needed.
+        Intent intent = getIntent();
+        if (intent != null)
+        {
+            this.title = intent.getStringExtra("title");
+        }
     }
 
     @Override
@@ -170,12 +183,13 @@ public class EditorActivity extends Activity
         private static final String ACTION_BAR_TITLE_BUNDLE = "ACTION_BAR_TITLE";
         private static final String FILENAME_BUNDLE = "FILENAME_TITLE";
         private static final String EDIT_MARKDOWN_TEXT_BUNDLE = "EDIT_MARKDOWN_TEXT";
-        public static final String MD_EXTENSION = ".md";
         private String title;
         private String filename;
         private String editMarkdownText;
         private EditText editMarkdown;
         private WebView webPreview;
+        private double scrollPercent;
+        private boolean hasAdjusted;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -197,27 +211,36 @@ public class EditorActivity extends Activity
         @Override
         public void onViewStateRestored(Bundle savedInstanceState) {
             super.onViewStateRestored(savedInstanceState);
-            if (null == savedInstanceState)
+            EditorActivity editorActivity = (EditorActivity) getActivity();
+            String openTitle = editorActivity.title;
+            if ((filename == null) && (openTitle != null) && (!openTitle.isEmpty()))
             {
-                newDocument();
+                openDocument(openTitle);
             }
             else
             {
-                // Restore text from editor.
-                String loadedTitle = savedInstanceState.getString(ACTION_BAR_TITLE_BUNDLE);
-                String loadedFilename = savedInstanceState.getString(FILENAME_BUNDLE);
-                String loadedEditMarkdownText =
-                        savedInstanceState.getString(EDIT_MARKDOWN_TEXT_BUNDLE);
-                Log.i("EditorActivity.onViewStateRestored",
-                        String.format("Loading from Bundle savedInstanceState: " +
-                                        "(title = %s, filename = %s, editMarkdownText = %s)",
-                                loadedTitle, loadedFilename, loadedEditMarkdownText
-                        )
-                );
-                setTitle(loadedTitle);
-                filename = loadedFilename;
-                editMarkdownText = loadedEditMarkdownText;
-                editMarkdown.setText(editMarkdownText);
+                if (null == savedInstanceState)
+                {
+                    newDocument();
+                }
+                else
+                {
+                    // Restore text from editor.
+                    String loadedTitle = savedInstanceState.getString(ACTION_BAR_TITLE_BUNDLE);
+                    String loadedFilename = savedInstanceState.getString(FILENAME_BUNDLE);
+                    String loadedEditMarkdownText =
+                            savedInstanceState.getString(EDIT_MARKDOWN_TEXT_BUNDLE);
+                    Log.i("EditorActivity.onViewStateRestored",
+                            String.format("Loading from Bundle savedInstanceState: " +
+                                            "(title = %s, filename = %s, editMarkdownText = %s)",
+                                    loadedTitle, loadedFilename, loadedEditMarkdownText
+                            )
+                    );
+                    setTitle(loadedTitle);
+                    filename = loadedFilename;
+                    editMarkdownText = loadedEditMarkdownText;
+                    editMarkdown.setText(editMarkdownText);
+                }
             }
         }
 
@@ -270,9 +293,23 @@ public class EditorActivity extends Activity
             if (null == webPreview)
             {
                 Log.d("EditorActivity.onCreateView", "Initializing webPreview...");
-                webPreview = (WebView) rootView.findViewById(R.id.web_preview);
+                hasAdjusted = true;
+                webPreview = (WebView) rootView.findViewById(R.id.web_editorpreview);
                 webPreview.setBackgroundColor(0x00000000);
                 webPreview.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
+                webPreview.setPictureListener(new WebView.PictureListener() {
+                    @Override
+                    public void onNewPicture(WebView webView, Picture picture) {
+                        if (!hasAdjusted && scrollPercent != 0)
+                        {
+                            double newMaxScrollY = (int) Math.floor(webPreview.getContentHeight() * webPreview.getScaleY());
+                            double newScrollYDouble = (newMaxScrollY * scrollPercent);
+                            int newScrollY = (int) newScrollYDouble;
+                            webPreview.scrollTo(webPreview.getScrollX(), newScrollY);
+                            hasAdjusted = true;
+                        }
+                    }
+                });
             }
 
             editMarkdown.addTextChangedListener(new TextWatcher()
@@ -284,9 +321,12 @@ public class EditorActivity extends Activity
                             MarkdownDocument.getInstance(filename, editMarkdownText);
                     WebDocument webDocument = WebDocument.getInstance(markdownDocument,
                             CssDocument.getDefaultInstance(getActivity()));
-                    webPreview.loadData(webDocument.getContent(), "text/html", null);
+                    loadPreview(webDocument);
 
-                    saveDocument();
+                    if ((filename != null) && (!filename.isEmpty()))
+                    {
+                        saveDocument();
+                    }
                 }
 
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -317,7 +357,7 @@ public class EditorActivity extends Activity
                         saveDocument();
                     }
                     title = input.getText().toString();
-                    filename = title + MD_EXTENSION;
+                    filename = title + Constants.MD_EXTENSION;
                     Log.i("EditorActivity.onViewStateRestored",
                             String.format("Creating new document (title = %s): %s",
                                     title, filename)
@@ -379,7 +419,7 @@ public class EditorActivity extends Activity
             }
 
             String openTitle = title;
-            String openFilename = openTitle + MD_EXTENSION;
+            String openFilename = openTitle + Constants.MD_EXTENSION;
             File dirMarkdown = new File(getExternalFilesDir(), getString(R.string.dir_md));
             File inputFile = new File(dirMarkdown, openFilename);
             if (!inputFile.exists())
@@ -403,7 +443,7 @@ public class EditorActivity extends Activity
                         openText += scanner.nextLine() + MarkdownUtils.LINE_SEPARATOR;
                     }
                     scanner.close();
-                     setTitle(openTitle);
+                    setTitle(openTitle);
                     filename = openFilename;
                     editMarkdownText = openText;
                     editMarkdown.setText(openText);
@@ -411,7 +451,7 @@ public class EditorActivity extends Activity
                             MarkdownDocument.getInstance(filename, editMarkdownText);
                     WebDocument webDocument = WebDocument.getInstance(markdownDocument,
                             CssDocument.getDefaultInstance(getActivity()));
-                    webPreview.loadData(webDocument.getContent(), "text/html", null);
+                    loadPreview(webDocument);
                 }
                 catch (IOException e)
                 {
@@ -419,6 +459,21 @@ public class EditorActivity extends Activity
                             String.format("Unable to read file %s:", openFilename), e);
                 }
             }
+        }
+
+        private void loadPreview(WebDocument webDocument) {
+            double currentScrollY = webPreview.getScrollY();
+            double maxScrollY = (int) Math.floor(webPreview.getContentHeight() * webPreview.getScaleY());
+            if (currentScrollY != 0 && maxScrollY != 0)
+            {
+                scrollPercent = currentScrollY / maxScrollY;
+            }
+            Log.i("EditorActivity.loadPreview",
+                    String.format("currentScrollY = %f, maxScrollY = %f , scrollPercent = %f",
+                            currentScrollY, maxScrollY, scrollPercent)
+            );
+            webPreview.loadData(webDocument.getContent(), "text/html", null);
+            hasAdjusted = scrollPercent == 0;
         }
 
         public void saveDocument()
@@ -436,7 +491,8 @@ public class EditorActivity extends Activity
                 {
                     Log.e("editMarkdown.saveDocument",
                             String.format("Unable to create new file %s:",
-                                    filename), e
+                                    filename),
+                            e
                     );
                 }
             }

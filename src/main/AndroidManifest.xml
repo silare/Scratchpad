@@ -15,6 +15,10 @@
         <activity
             android:name=".editor.EditorActivity"
             android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name=".picker.PickerActivity"
+            android:label="@string/app_name" >
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

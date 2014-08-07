@@ -10,6 +10,7 @@
     <string name="action_new">New</string>
     <string name="action_open">Open</string>
     <string name="action_save">Save</string>
+    <string name="action_edit">Edit</string>
     <string name="action_settings">Settings</string>
     <string name="dir_md">Scratchpad/markdown</string>
     <string name="dir_html">Scratchpad/html</string>
@@ -20,7 +21,6 @@
     <string name="open_hint">Document title</string>
     <string name="action_set_title">SET_TITLE</string>
     <string name="extra_title">title</string>
-    <string name="title_activity_picker">PickerActivity</string>
     <string name="button_ok">OK</string>
     <string name="button_cancel">Cancel</string>
     <string name="hello_world">Hello world!</string>
